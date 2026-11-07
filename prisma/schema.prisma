@@ -1,0 +1,31 @@
+// Локально — SQLite. Для продакшена на Vercel поменять provider на "postgresql"
+// и указать DATABASE_URL от Vercel Postgres / Supabase.
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Order {
+  id        String   @id @default(cuid())
+  email     String
+  status    String   @default("pending") // pending | paid
+  amount    Int // в копейках
+  paymentId String?  @unique
+  createdAt DateTime @default(now())
+  game      Game?
+}
+
+model Game {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  orderId   String   @unique
+  order     Order    @relation(fields: [orderId], references: [id])
+  answers   String? // JSON
+  scenario  String? // JSON
+  emailSent Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
