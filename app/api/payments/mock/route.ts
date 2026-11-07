@@ -11,6 +11,7 @@ export async function GET(req: Request) {
   const order = await db.order.findUnique({ where: { id: orderId } });
   if (!order) return new NextResponse("Заказ не найден", { status: 404 });
 
-  await fulfillOrder(order.id);
-  return NextResponse.redirect(new URL("/success", req.url), 303);
+  const game = await fulfillOrder(order.id);
+  // В тестовом режиме писем может не быть, поэтому ссылку сразу показываем на странице.
+  return NextResponse.redirect(new URL(`/success?play=${encodeURIComponent(game.token)}`, req.url), 303);
 }

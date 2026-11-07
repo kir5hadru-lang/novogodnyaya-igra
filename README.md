@@ -14,12 +14,13 @@
 
 ```bash
 npm install
-cp .env.example .env
-npx prisma db push
+npx vercel env pull .env
 npm run dev
 ```
 
-В режиме `PAYMENT_PROVIDER=mock` оплата проходит сразу. Пока не задан `RESEND_API_KEY`, письмо не отправляется, а ссылка на игру печатается в консоль сервера.
+`vercel env pull` скачивает настройки с Vercel, в том числе адрес базы данных.
+
+В режиме `PAYMENT_PROVIDER=mock` оплата проходит сразу. Пока не задан `RESEND_API_KEY`, письмо не отправляется, а ссылка на игру печатается в консоль сервера и показывается на странице `/success`.
 
 ## Где что менять
 
@@ -30,7 +31,9 @@ npm run dev
 
 ## Запуск в продакшен (Vercel)
 
-1. База: в `prisma/schema.prisma` поменять `provider` на `"postgresql"`, подключить Vercel Postgres или Supabase и задать `DATABASE_URL`.
+1. База: в Vercel → Storage подключить Neon Postgres к проекту, и `DATABASE_URL` появится сам. Таблицы создаются при сборке (`prisma db push`).
 2. Почта: зарегистрироваться в Resend, подтвердить свой домен и задать `RESEND_API_KEY` и `EMAIL_FROM`.
 3. Оплата: в ЮKassa получить `shopId` и секретный ключ, задать `PAYMENT_PROVIDER=yookassa`, `YOOKASSA_SHOP_ID`, `YOOKASSA_SECRET_KEY`. В личном кабинете указать вебхук `https://<домен>/api/payments/webhook` на событие `payment.succeeded`. Если чеки по 54-ФЗ не нужны, убрать блок `receipt` в `lib/payments/yookassa.ts`.
-4. `APP_URL=https://<домен>` — из него строится ссылка в письме.
+4. `APP_URL=https://<домен>` — из него строится ссылка в письме. Если не задан, берётся основной адрес проекта на Vercel.
+
+В тестовом режиме (`PAYMENT_PROVIDER=mock`) ссылка на игру показывается прямо на странице после «оплаты».

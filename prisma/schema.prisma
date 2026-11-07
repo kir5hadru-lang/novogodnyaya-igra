@@ -1,11 +1,11 @@
-// Локально — SQLite. Для продакшена на Vercel поменять provider на "postgresql"
-// и указать DATABASE_URL от Vercel Postgres / Supabase.
+// База — Postgres (Neon через Vercel). DATABASE_URL Vercel подставляет сам,
+// локально его можно получить командой `npx vercel env pull .env`.
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
